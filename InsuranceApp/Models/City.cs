@@ -3,9 +3,7 @@ namespace InsuranceApp.Models;
 
 public class City
 {
-    public int CityId { get; set; }
-
-    public required string PostCode { get; set; }
+    public int CityId { get; set; } = 1;
 
     [StringLength(40)] 
     public required string CityName { get; set; }

@@ -44,21 +44,75 @@ namespace InsuranceApp.Services
             }
         }
 
-        // Add a new partner
-        public async Task AddPartnerAsync(Partner partner)
+        // Dohvat imena grada prema CityId
+        public async Task<string> GetCityNameByIdAsync(int cityId)
         {
             try
             {
-                // If CreatedAtUtc is not set, the default DateTime.UtcNow will be used
+                // SQL upit za dohvat imena grada prema CityId
+                var query = "SELECT CityName FROM City WHERE CityId = @CityId";
+                
+                // Izvrši upit i dohvatimo ime grada
+                var cityName = await _dbConnection.QuerySingleOrDefaultAsync<string>(query, new { CityId = cityId });
+
+                // Ako grad nije pronađen, vraćamo "Unknown City"
+                return cityName ?? "Unknown City";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Greška prilikom dohvaćanja grada za ID {cityId}: {ex.Message}");
+                return "Unknown City"; // U slučaju greške
+            }
+        }
+
+        public async Task<IEnumerable<City>> GetAllCitiesAsync()
+        {
+            const string query = "SELECT CityId, CityName FROM City ORDER BY CityName";
+
+            var cities = await _dbConnection.QueryAsync<City>(query);
+            return cities;
+        }
+
+        // Add a new partner
+        public async Task AddPartnerAsync(Partner partner)
+        {
+            
+            try
+            {
+                // Provjera postoji li partner s istim CroatianPIN (OIB)
+                var existingPartnerByPIN = await _dbConnection.QueryFirstOrDefaultAsync<Partner>(
+                    "SELECT * FROM Partner WHERE CroatianPIN = @CroatianPIN", new { CroatianPIN = partner.CroatianPIN });
+
+                if (existingPartnerByPIN != null)
+                {
+                    throw new ApplicationException("OIB (Croatian PIN) already exists.");
+                }
+
+                // Provjera postoji li partner s istim ExternalCode
+                var existingPartnerByExternalCode = await _dbConnection.QueryFirstOrDefaultAsync<Partner>(
+                    "SELECT * FROM Partner WHERE ExternalCode = @ExternalCode", new { ExternalCode = partner.ExternalCode });
+
+                if (existingPartnerByExternalCode != null)
+                {
+                    throw new ApplicationException("External Code already exists.");
+                }
+
+                Console.WriteLine($"FirstName: {partner.FirstName}");
+                Console.WriteLine($"LastName: {partner.LastName}");
+                Console.WriteLine($"CityId: {partner.CityId}");
+                Console.WriteLine($"PartnerNumber: {partner.PartnerNumber}");
+
+                // Ako CreatedAtUtc nije postavljen, postavlja se trenutni UTC datum
                 if (partner.CreatedAtUtc == default)
                 {
                     partner.CreatedAtUtc = DateTime.UtcNow;
                 }
 
+                // SQL upit za unos partnera u bazu
                 var query = @"
                     INSERT INTO Partner (FirstName, LastName, Address, PartnerNumber, CroatianPIN, PartnerTypeId, CreatedAtUtc, CreateByUser, IsForeign, ExternalCode, Gender, CityId)
                     VALUES (@FirstName, @LastName, @Address, @PartnerNumber, @CroatianPIN, @PartnerTypeId, @CreatedAtUtc, @CreateByUser, @IsForeign, @ExternalCode, @Gender, @CityId)";
-                
+            
                 await _dbConnection.ExecuteAsync(query, partner);
             }
             catch (Exception ex)
@@ -67,6 +121,5 @@ namespace InsuranceApp.Services
                 throw new ApplicationException("Došlo je do greške prilikom dodavanja partnera.", ex);
             }
         }
-
     }
 }

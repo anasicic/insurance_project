@@ -38,7 +38,14 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 // Map default route for controllers
-app.MapDefaultControllerRoute();
+app.MapControllerRoute(
+    name: "default", 
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Map route for creating partner (use the PartnerController and AddPartner method)
+app.MapControllerRoute(
+    name: "createPartner",
+    pattern: "CreatePartner/{action=Create}/{id?}");
 
 // Run the application
 app.Run();

@@ -1,7 +1,7 @@
 using InsuranceApp.Services;
 using InsuranceApp.Models;
 using Microsoft.AspNetCore.Mvc;
-
+using InsuranceApp.DTOs;
 
 namespace InsuranceApp.Controllers
 {
@@ -22,66 +22,93 @@ namespace InsuranceApp.Controllers
         {
             try
             {
-                // Fetching partners from the service.
                 var partners = await _partnerService.GetAllPartnersAsync();
-        
-                // If there are no partners, it returns a 404 Not Found.
                 if (partners == null || !partners.Any())
                 {
                     return NotFound("No partners found.");
                 }
-
-                // It returns HTTP 200 with the list of partners.
                 return Ok(partners);
             }
             catch (Exception ex)
             {
-                // Error handling - it returns a 500 status with an error message.
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
-        // GET: api/partners/{id}
+        // GET: /Partner/Details/{id}
+        [HttpGet("Details/{id}")]
+        public async Task<IActionResult> GetPartnerDetails(int id)
+        {
+            var partner = await _partnerService.GetPartnerByIdAsync(id);
+            if (partner == null)
+            {
+                return NoContent();
+            }
+            
+            var partnerTypeMap = new Dictionary<int, string>
+            {
+                { 1, "Personal" },
+                { 2, "Legal" }
+            };
+
+            var cityName = await _partnerService.GetCityNameByIdAsync(partner.CityId);
+
+
+            var partnerDetailDto = new PartnerDetailDTO
+            {
+                Id = partner.PartnerId,
+                FirstName = partner.FirstName,
+                LastName = partner.LastName,
+                PartnerNumber = partner.PartnerNumber,
+                CroatianPIN = partner.CroatianPIN,
+                PartnerTypeId = partner.PartnerTypeId,
+                PartnerTypeName = partnerTypeMap[partner.PartnerTypeId],
+                IsForeign = partner.IsForeign,
+                CreatedAtUtc = partner.CreatedAtUtc,
+                CreateByUser = partner.CreateByUser ?? "admin@example.com",
+                Gender = partner.Gender,
+                CityName = cityName,
+                CityId = partner.CityId,
+                Address = partner.Address,
+                ExternalCode = partner.ExternalCode
+            };
+
+            return Ok(partnerDetailDto);
+        }
+
+        // GET: api/partner/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Partner>> GetPartnerById(int id)
         {
-            try
+            var partner = await _partnerService.GetPartnerByIdAsync(id);
+            if (partner == null)
             {
-                var partner = await _partnerService.GetPartnerByIdAsync(id);
-                if (partner == null)
-                {
-                    // Ako partner nije pronađen, vraća HTTP 404
-                    return NotFound($"Partner with ID {id} not found.");
-                }
-                // Vraća HTTP 200 sa partnerom
-                return Ok(partner);
+                return NotFound($"Partner with ID {id} not found.");
             }
-            catch (Exception ex)
-            {
-                // Rukovanje greškom - vraća status 500 sa porukom greške
-                return StatusCode(500, $"Error fetching partner by ID {id}: {ex.Message}");
-            }
+            return Ok(partner);
         }
 
         // POST: api/partner
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<ActionResult<Partner>> AddPartner([FromBody] Partner partner)
         {
             if (partner == null)
             {
-                // If the data is not valid, it returns HTTP 400 Bad Request.
                 return BadRequest("Partner data is required.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             try
             {
                 await _partnerService.AddPartnerAsync(partner);
-                // Returns HTTP 201 Created with the details of the new partner.
                 return CreatedAtAction(nameof(GetPartnerById), new { id = partner.PartnerId }, partner);
             }
             catch (Exception ex)
             {
-                // Error handling - returns status 500 with an error message.
                 return StatusCode(500, $"Error adding partner: {ex.Message}");
             }
         }

@@ -1,41 +1,67 @@
--- Kreirajte tablicu State (prva tablica)
-CREATE TABLE IF NOT EXISTS State (
+"""-- State Table
+CREATE TABLE State (
     StateId INTEGER PRIMARY KEY AUTOINCREMENT,
-    StateName TEXT NOT NULL
+    StateName TEXT NOT NULL CHECK(LENGTH(StateName) BETWEEN 1 AND 40)
 );
 
--- Kreirajte tablicu City (povezana s tablicom State)
-CREATE TABLE IF NOT EXISTS City (
+-- City Table
+CREATE TABLE City (
     CityId INTEGER PRIMARY KEY AUTOINCREMENT,
-    CityName TEXT NOT NULL,
-    PostCode TEXT,
-    StateId INTEGER,  -- Vanjski ključ prema State
-    FOREIGN KEY (StateId) REFERENCES State(StateId) ON DELETE CASCADE
+    CityName TEXT NOT NULL CHECK(LENGTH(CityName) BETWEEN 1 AND 40),
+    StateId INTEGER NOT NULL,
+    FOREIGN KEY(StateId) REFERENCES State(StateId)
 );
 
--- Kreirajte tablicu Partner (povezana s tablicama City i State)
-CREATE TABLE IF NOT EXISTS Partner (
+-- Partner Table
+CREATE TABLE Partner (
     PartnerId INTEGER PRIMARY KEY AUTOINCREMENT,
-    FirstName TEXT NOT NULL,
-    LastName TEXT NOT NULL,
+    FirstName TEXT NOT NULL CHECK(LENGTH(FirstName) BETWEEN 2 AND 255),
+    LastName TEXT NOT NULL CHECK(LENGTH(LastName) BETWEEN 2 AND 255),
     Address TEXT,
-    PartnerNumber TEXT NOT NULL,
-    CroatianPIN TEXT,
+    PartnerNumber TEXT NOT NULL CHECK(LENGTH(PartnerNumber) = 20),
+    CroatianPIN TEXT CHECK(LENGTH(CroatianPIN) = 11),
     PartnerTypeId INTEGER NOT NULL,
-    CreatedAtUtc TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CreatedAtUtc TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CreateByUser TEXT NOT NULL,
     IsForeign BOOLEAN NOT NULL,
-    ExternalCode TEXT NOT NULL,
-    Gender CHAR(1) CHECK (Gender IN ('M', 'F', 'N')),
-    CityId INTEGER, 
-    FOREIGN KEY (CityId) REFERENCES City(CityId) ON DELETE SET NULL
+    ExternalCode TEXT NOT NULL CHECK(LENGTH(ExternalCode) BETWEEN 10 AND 20),
+    Gender CHAR(1) CHECK(Gender IN ('M', 'F', 'N')),
+    CityId INTEGER NOT NULL,
+    FOREIGN KEY(CityId) REFERENCES City(CityId)
 );
 
--- Kreirajte tablicu Policy (povezana s tablicom Partner)
-CREATE TABLE IF NOT EXISTS Policy (
+-- Policy Table
+CREATE TABLE Policy (
     PolicyId INTEGER PRIMARY KEY AUTOINCREMENT,
-    PolicyNumber TEXT NOT NULL,
-    PolicyAmount DECIMAL NOT NULL,
-    PartnerId INTEGER,  -- Vanjski ključ prema Partner
-    FOREIGN KEY (PartnerId) REFERENCES Partner(PartnerId) ON DELETE CASCADE
+    PolicyNumber TEXT NOT NULL CHECK(LENGTH(PolicyNumber) BETWEEN 10 AND 15),
+    PolicyAmount DECIMAL(18, 2) NOT NULL,
+    PartnerId INTEGER NOT NULL,
+    FOREIGN KEY(PartnerId) REFERENCES Partner(PartnerId)
 );
+
+-- Insertion for State table
+INSERT INTO State (StateName) 
+VALUES 
+('Croatia'),
+('Austria');
+
+-- Insertion for City table
+INSERT INTO City (CityName, StateId) 
+VALUES 
+('Zagreb', 1),
+('Split', 1),
+('Zadar', 1);
+
+-- Insertion for Partner table
+INSERT INTO Partner (FirstName, LastName, Address, PartnerNumber, CroatianPIN, PartnerTypeId, CreateByUser, IsForeign, ExternalCode, Gender, CityId) 
+VALUES 
+('Ivan', 'Horvat', 'Zagrebačka cesta 50', '12345678901234567890', '12345678901', 1, 'admin@insurance.com', 0, 'EXTERNALCODE1234', 'M', 1),
+('Ana', 'Kovač', 'Splitska 2', '09876543210987654321', '10987654321', 2, 'admin@insurance.com', 1, 'EXTERNALCODE5678', 'F', 1);
+
+-- Insertion for Policy table
+INSERT INTO Policy (PolicyNumber, PolicyAmount, PartnerId) 
+VALUES 
+('POLICY12345678', 1000.00, 1),
+('POLICY09876543', 5500.00, 2);
+
+"""

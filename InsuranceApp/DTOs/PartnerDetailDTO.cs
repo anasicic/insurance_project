@@ -24,6 +24,8 @@ public class PartnerDetailDTO
 
     public required int PartnerTypeId { get; set; }
 
+    public string PartnerTypeName { get; set; }="";
+
     public required  DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
     [EmailAddress]
@@ -39,5 +41,7 @@ public class PartnerDetailDTO
     public required char Gender { get; set; }
 
     public required int CityId { get; set; }
+
+    public string CityName { get; set; } ="";
 
 }

@@ -1,0 +1,108 @@
+﻿@model InsuranceApp.Models.Partner
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Entry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-4">Enter New Partner</h2>
+        <form asp-action="Create" asp-controller="CreatePartner" method="post" id="partnerForm">
+            <div class="mb-3">
+                <label asp-for="FirstName" class="form-label">First Name</label>
+                <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="LastName" class="form-label">Last Name</label>
+                <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Address" class="form-label">Address</label>
+                <input asp-for="Address" class="form-control" placeholder="Enter address" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="PartnerNumber" class="form-label">Partner Number</label>
+                <input asp-for="PartnerNumber" class="form-control" placeholder="Enter partner number (20 characters)" minlength="20" maxlength="20" />
+                <span asp-validation-for="PartnerNumber" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="PartnerTypeId" class="form-label">Partner Type</label>
+                <select asp-for="PartnerTypeId" class="form-control">
+                    <option value="" disabled @(Model.PartnerTypeId == 0 ? "selected" : "")>Choose option</option>
+                    <option value="1" @(Model.PartnerTypeId == 1 ? "selected" : "")>Personal</option>
+                    <option value="2" @(Model.PartnerTypeId == 2 ? "selected" : "")>Legal</option>
+                </select>
+                <span asp-validation-for="PartnerTypeId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CroatianPIN" class="form-label">Tax Number (OIB)</label>
+                <input asp-for="CroatianPIN" class="form-control" placeholder="Enter tax number (OIB)" maxlength="11" />
+                <span asp-validation-for="CroatianPIN" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CityId" class="form-label">City</label>
+                <select asp-for="CityId" class="form-control">
+                    <option value="" disabled @(Model.CityId == 0 ? "selected" : "")>Choose option</option>
+                    @if (ViewBag.Cities != null)
+                    {
+                        var cities = ViewBag.Cities as IEnumerable<InsuranceApp.Models.City>;
+                        if (cities != null)
+                        {
+                            foreach (var city in cities)
+                            {
+                                <option value="@city.CityId" @(Model.CityId == city.CityId ? "selected" : "")>@city.CityName</option>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <option value="1" selected>Zagreb</option> <!-- Default Zagreb -->
+                    }
+                </select>
+                <span asp-validation-for="CityId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Gender" class="form-label">Gender</label>
+                <select asp-for="Gender" class="form-control">
+                    <option value="" disabled selected>Choose option</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                    <option value="N">Non-binary</option>
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="IsForeign" class="form-label">Foreign Partner</label>
+                <select asp-for="IsForeign" class="form-control">
+                    <option value="" disabled selected>Choose option </option>
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+                <span asp-validation-for="IsForeign" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ExternalCode" class="form-label">External Code</label>
+                <input asp-for="ExternalCode" class="form-control" placeholder="Enter external code (if any)" />
+                <span asp-validation-for="ExternalCode" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CreateByUser" class="form-label">Created By User</label>
+                <input asp-for="CreateByUser" class="form-control" value="admin@example.com" readonly />
+                <span asp-validation-for="CreateByUser" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Partner</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>  
