@@ -78,6 +78,13 @@
             gap: 8px;
             justify-content: center;
         }
+
+        /* Stil za novi partner koji je upravo dodan */
+        .newly-added {
+            background-color: #d4edda;  /* Svijetla zelena pozadina */
+            font-weight: bold;          /* Podebljan font */
+            color: #155724;             /* Tamno zelena boja za tekst */
+        }
     </style>
 </head>
 
@@ -107,7 +114,9 @@
             <tbody>
                 @foreach (var partner in Model)
                 {
-                    <tr class="align-middle">
+                    // Provjera je li partner nedavno dodan
+                    var isNewlyAdded = TempData["Success"] is int successId && successId == partner.PartnerId;
+                    <tr class="@(isNewlyAdded ? "newly-added" : "")">
                         <td>@partner.FullName</td>
                         <td>@partner.PartnerNumber</td>
                         <td>@partner.CroatianPIN</td>
@@ -117,9 +126,9 @@
                         <td>@partner.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
                         <td class="action-buttons">
                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#partnerModal"
-                                onclick="showPartnerDetails(@partner.PartnerId)">Details</button>
+                                    onclick="showPartnerDetails(@partner.PartnerId)">Details</button>
                             <a href="@Url.Action("AddPolicy", "CreatePolicy", new { partnerId = partner.PartnerId })"
-                                class="btn btn-success btn-sm">Add Policy</a>
+                               class="btn btn-success btn-sm">Add Policy</a>
                         </td>
                     </tr>
                 }
@@ -173,7 +182,6 @@
                         <tr><th>Created By</th><td>${data.createByUser}</td></tr>
                         <tr><th>Foreign Status</th><td>${data.isForeign ? "Foreign partner" : "Local partner"}</td></tr>
                         <tr><th>Gender</th><td>${data.gender}</td></tr>
-                        
                     `;
                     document.getElementById("partnerDetails").innerHTML = details;
                 })

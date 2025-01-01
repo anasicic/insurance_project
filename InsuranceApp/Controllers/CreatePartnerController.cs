@@ -72,8 +72,16 @@ namespace InsuranceApp.Controllers
                 // Dodavanje partnera pomoću servisa
                 await _partnerService.AddPartnerAsync(partner);
 
+                // Provjerite je li partner ID ispravno postavljen prije nego što ga pohranite u TempData
+                if (partner.PartnerId == 0)
+                {
+                    throw new ApplicationException("Partner ID nije ispravno postavljen.");
+                }
+
                 // Preusmjerava na neki drugi View nakon uspješnog dodavanja (npr. popis partnera)
-                TempData["SuccessMessage"] = "Partner successfully added!";
+                TempData["Success"] = partner.PartnerId;  // Spremamo ID novog partnera
+                Console.WriteLine($"Partner ID {partner.PartnerId} is set in TempData.");
+
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)

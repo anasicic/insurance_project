@@ -79,7 +79,7 @@ namespace InsuranceApp.Services
             
             try
             {
-                // Provjera postoji li partner s istim CroatianPIN (OIB)
+                // Check if a partner with the same CroatianPIN (OIB) already exists
                 var existingPartnerByPIN = await _dbConnection.QueryFirstOrDefaultAsync<Partner>(
                     "SELECT * FROM Partner WHERE CroatianPIN = @CroatianPIN", new { CroatianPIN = partner.CroatianPIN });
 
@@ -88,7 +88,7 @@ namespace InsuranceApp.Services
                     throw new ApplicationException("OIB (Croatian PIN) already exists.");
                 }
 
-                // Provjera postoji li partner s istim ExternalCode
+                // Check if a partner with the same ExternalCode already exists
                 var existingPartnerByExternalCode = await _dbConnection.QueryFirstOrDefaultAsync<Partner>(
                     "SELECT * FROM Partner WHERE ExternalCode = @ExternalCode", new { ExternalCode = partner.ExternalCode });
 
@@ -111,9 +111,16 @@ namespace InsuranceApp.Services
                 // SQL upit za unos partnera u bazu
                 var query = @"
                     INSERT INTO Partner (FirstName, LastName, Address, PartnerNumber, CroatianPIN, PartnerTypeId, CreatedAtUtc, CreateByUser, IsForeign, ExternalCode, Gender, CityId)
-                    VALUES (@FirstName, @LastName, @Address, @PartnerNumber, @CroatianPIN, @PartnerTypeId, @CreatedAtUtc, @CreateByUser, @IsForeign, @ExternalCode, @Gender, @CityId)";
-            
-                await _dbConnection.ExecuteAsync(query, partner);
+                    VALUES (@FirstName, @LastName, @Address, @PartnerNumber, @CroatianPIN, @PartnerTypeId, @CreatedAtUtc, @CreateByUser, @IsForeign, @ExternalCode, @Gender, @CityId);
+                    SELECT last_insert_rowid();";  // This will return the last inserted ID
+                
+                // Execute the query and retrieve the PartnerId
+                var partnerId = await _dbConnection.QuerySingleAsync<int>(query, partner);
+
+                partner.PartnerId = partnerId;
+
+                // Log the PartnerId 
+                Console.WriteLine($"Partner ID: {partnerId}");
             }
             catch (Exception ex)
             {
