@@ -43,11 +43,34 @@ namespace InsuranceApp.Services
             }
         }
 
+        // Get a policy by PolicyNumber to check for duplicates
+        public async Task<Policy?> GetPolicyByNumberAsync(string policyNumber)
+        {
+            try
+            {
+                var query = "SELECT * FROM Policy WHERE PolicyNumber = @PolicyNumber";
+                // Vraća Policy ili null ako ne postoji
+                return await _dbConnection.QueryFirstOrDefaultAsync<Policy>(query, new { PolicyNumber = policyNumber });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error checking policy by number: {ex.Message}");
+                throw;
+            }
+        }
+
         // Add a new policy
         public async Task AddPolicyAsync(Policy policy)
         {
             try
             {
+                // Check if the policy number already exists
+                var existingPolicy = await GetPolicyByNumberAsync(policy.PolicyNumber);
+                if (existingPolicy != null)
+                {
+                    throw new InvalidOperationException("Policy number already exists.");
+                }
+
                 var query = @"
                     INSERT INTO Policy (PolicyNumber, PolicyAmount, PartnerId)
                     VALUES (@PolicyNumber, @PolicyAmount, @PartnerId)";
@@ -56,9 +79,8 @@ namespace InsuranceApp.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding new policy: {ex.Message}");
-                throw; 
+                throw;
             }
         }
-        
     }
 }

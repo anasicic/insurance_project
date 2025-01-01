@@ -112,5 +112,7 @@ namespace InsuranceApp.Controllers
                 return StatusCode(500, $"Error adding partner: {ex.Message}");
             }
         }
+
+        
     }
 }

@@ -118,7 +118,7 @@
                         <td class="action-buttons">
                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#partnerModal"
                                 onclick="showPartnerDetails(@partner.PartnerId)">Details</button>
-                            <a href="@Url.Action("AddPolicy", "Policy", new { partnerId = partner.PartnerId })"
+                            <a href="@Url.Action("AddPolicy", "CreatePolicy", new { partnerId = partner.PartnerId })"
                                 class="btn btn-success btn-sm">Add Policy</a>
                         </td>
                     </tr>

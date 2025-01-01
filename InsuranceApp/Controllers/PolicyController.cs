@@ -30,9 +30,10 @@ namespace InsuranceApp.Controllers
                 // Log the exception
                 Console.WriteLine($"Error fetching all policies: {ex.Message}");
                 // Throw the exception so it can be handled by global exception handler or middleware
-                throw new InvalidOperationException("An error occurred while retrieving policies.", ex);
+                return StatusCode(500, "An error occurred while retrieving policies."); // Vraća statusni kod 500 za grešku
             }
-        }
+            }
+        
 
         // Get policies by PartnerId
         [HttpGet("{partnerId}")]
@@ -53,9 +54,10 @@ namespace InsuranceApp.Controllers
                 // Log the exception
                 Console.WriteLine($"Error fetching policies for partnerId {partnerId}: {ex.Message}");
                 // Throw the exception so it can be handled by global exception handler or middleware
-                throw new InvalidOperationException($"An error occurred while retrieving policies for partner ID {partnerId}.", ex);
+                return StatusCode(500, "An error occurred while retrieving policies for the specified partner.");
             }
-        }
+            }
+        
 
         // Add a new policy
         [HttpPost]
@@ -63,20 +65,31 @@ namespace InsuranceApp.Controllers
         {
             try
             {
+                // Provjeri validnost modela
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
 
+                // Provjeri postoji li već polisa s istim brojem
+                var existingPolicy = await _policyService.GetPolicyByNumberAsync(policy.PolicyNumber);
+                if (existingPolicy != null)
+                {
+                    // Ako postoji polisa s istim brojem, vraćamo status 409 Conflict
+                    return Conflict("Policy number already exists.");
+                }
+
+                // Ako sve prođe, dodajemo novu polisu
                 await _policyService.AddPolicyAsync(policy);
+
+                // Vraćamo status 201 Created i vraćamo detalje nove polise
                 return CreatedAtAction(nameof(GetPoliciesByPartnerId), new { partnerId = policy.PartnerId }, policy);
             }
             catch (Exception ex)
             {
-                // Log the exception
+                // Ako dođe do greške, logiramo iznimku i vraćamo status 500
                 Console.WriteLine($"Error adding policy: {ex.Message}");
-                // Throw the exception to be handled by global exception handler or middleware
-                throw new InvalidOperationException("An error occurred while adding the policy.", ex);
+                return StatusCode(500, "An error occurred while adding the policy.");
             }
         }
     }

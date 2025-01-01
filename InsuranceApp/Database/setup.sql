@@ -39,6 +39,12 @@ CREATE TABLE Policy (
     FOREIGN KEY(PartnerId) REFERENCES Partner(PartnerId)
 );
 
+-- Dodavanje jedinstvenog indeksa za CroatianPIN (OIB)
+CREATE UNIQUE INDEX idx_partner_oib ON Partner (CroatianPIN);
+
+-- Dodavanje jedinstvenog indeksa za ExternalCode
+CREATE UNIQUE INDEX idx_partner_externalcode ON Partner (ExternalCode);
+
 -- Insertion for State table
 INSERT INTO State (StateName) 
 VALUES 
