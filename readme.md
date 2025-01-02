@@ -123,7 +123,7 @@ To configure and set up the database, follow these steps:
     ```json
     {
       "ConnectionStrings": {
-        "DefaultConnection": "Data Source=InsuranceApp.db"
+        "DefaultConnection": "Data Source=insurance.db"
       }
     }
     ```
