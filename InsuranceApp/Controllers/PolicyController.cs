@@ -30,7 +30,7 @@ namespace InsuranceApp.Controllers
                 // Log the exception
                 Console.WriteLine($"Error fetching all policies: {ex.Message}");
                 // Throw the exception so it can be handled by global exception handler or middleware
-                return StatusCode(500, "An error occurred while retrieving policies."); // Vraća statusni kod 500 za grešku
+                return StatusCode(500, "An error occurred while retrieving policies."); // Return status code 500 for error
             }
             }
         
@@ -65,29 +65,29 @@ namespace InsuranceApp.Controllers
         {
             try
             {
-                // Provjeri validnost modela
+                // Check the validity of the model
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
 
-                // Provjeri postoji li već polisa s istim brojem
+                // Check if a policy with the same number already exists
                 var existingPolicy = await _policyService.GetPolicyByNumberAsync(policy.PolicyNumber);
                 if (existingPolicy != null)
                 {
-                    // Ako postoji polisa s istim brojem, vraćamo status 409 Conflict
+                    // If a policy with the same number exists, return status 409 Conflic
                     return Conflict("Policy number already exists.");
                 }
 
-                // Ako sve prođe, dodajemo novu polisu
+                // If everything is fine, add the new policy
                 await _policyService.AddPolicyAsync(policy);
 
-                // Vraćamo status 201 Created i vraćamo detalje nove polise
+                // Return status 201 Created and return the details of the new policy
                 return CreatedAtAction(nameof(GetPoliciesByPartnerId), new { partnerId = policy.PartnerId }, policy);
             }
             catch (Exception ex)
             {
-                // Ako dođe do greške, logiramo iznimku i vraćamo status 500
+                // If an error occurs, log the exception and return status 500
                 Console.WriteLine($"Error adding policy: {ex.Message}");
                 return StatusCode(500, "An error occurred while adding the policy.");
             }

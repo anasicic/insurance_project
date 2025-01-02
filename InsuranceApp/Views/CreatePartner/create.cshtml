@@ -46,9 +46,9 @@
             <div class="mb-3">
                 <label for="PartnerTypeId" class="form-label">Partner Type</label>
                 <select name="PartnerTypeId" id="PartnerTypeId" class="form-control">
-                    <option value="" disabled>Choose option</option>
-                    <option value="1">Personal</option>
-                    <option value="2">Legal</option>
+                    <option value="" selected disabled>Choose option</option>
+                    <option value="1" @(Model.PartnerTypeId == 1 ? "selected" : "")>Personal</option>
+                    <option value="2" @(Model.PartnerTypeId == 2 ? "selected" : "")>Legal</option>
                 </select>
                 <span class="text-danger"></span>
             </div>
@@ -64,7 +64,7 @@
             <div class="mb-3">
                 <label for="CityId" class="form-label">City</label>
                 <select name="CityId" id="CityId" class="form-control">
-                    <option value="" disabled>Choose option</option>
+                     <option value="" @(Model.CityId == 0 ? "selected" : "") disabled>Choose option</option>
                     @if (ViewBag.Cities != null)
                     {
                         var cities = ViewBag.Cities as IEnumerable<InsuranceApp.Models.City>;
@@ -72,13 +72,15 @@
                         {
                             foreach (var city in cities)
                             {
-                                <option value="@city.CityId">@city.CityName</option>
+                                <option value="@city.CityId" @(Model.CityId == city.CityId ? "selected" : "")>
+                                @city.CityName
+                                </option>
                             }
                         }
                     }
                     else
                     {
-                        <option value="1" selected>Zagreb</option> <!-- Default Zagreb -->
+                        <option value="1" @(Model.CityId == 1 ? "selected" : "")>Zagreb</option> <!-- Default Zagreb -->
                     }
                 </select>
                 <span class="text-danger"></span>
@@ -110,7 +112,7 @@
             <!-- External Code -->
             <div class="mb-3">
                 <label for="ExternalCode" class="form-label">External Code</label>
-                <input type="text" name="ExternalCode" id="ExternalCode" class="form-control" placeholder="Enter external code (if any)" />
+                <input type="text" name="ExternalCode" id="ExternalCode" class="form-control" placeholder="Enter external code" />
                 <span class="text-danger"></span>
             </div>
 

@@ -23,8 +23,7 @@ public class Partner
     [StringLength(11, MinimumLength = 11)]
     public string CroatianPIN { get; set; }= string.Empty;
 
-    [Required]  
-    public int PartnerTypeId { get; set; } = 1;
+    public required int PartnerTypeId { get; set; } = 1;
     [JsonIgnore]
     public DateTime CreatedAtUtc { get; set; } // Inicijalizacija samo kad se unosi  
  
@@ -42,6 +41,9 @@ public class Partner
     public required char Gender { get; set; } 
   
     public required int CityId { get; set; } = 1;
+
+    public int TotalPolicies { get; set; }
+    public decimal TotalPolicyAmount { get; set; } 
 
     
 }

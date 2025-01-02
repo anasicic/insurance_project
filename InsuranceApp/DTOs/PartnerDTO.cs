@@ -7,12 +7,10 @@ public class PartnerDTO
     public int PartnerId { get; set; }
 
     [StringLength(255, MinimumLength = 2)]
-    [Required]
-    public string FirstName { get; set; }= "";
+    public required string FirstName { get; set; }= "";
 
     [StringLength(255, MinimumLength = 2)]
-    [Required]
-    public string LastName { get; set; }= "";
+    public required string LastName { get; set; }= "";
 
     [StringLength(255, MinimumLength = 2)]  
     public string FullName => $"{FirstName} {LastName}";
@@ -22,11 +20,10 @@ public class PartnerDTO
 
     [StringLength(11, MinimumLength = 11)]
     public string CroatianPIN { get; set; } = "";
-
-    [Required]  
-    public int PartnerTypeId { get; set; } 
-    [Required]
-    public string PartnerTypeName { get; set; }="";
+    
+    public required int PartnerTypeId { get; set; }
+    
+    public required string PartnerTypeName { get; set; }="";
 
     public required bool IsForeign { get; set; } 
 
@@ -34,4 +31,8 @@ public class PartnerDTO
     public required char Gender { get; set; }
 
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow; 
+
+    public int TotalPolicies { get; set; }
+    public decimal TotalPolicyAmount { get; set; }
+    
 }

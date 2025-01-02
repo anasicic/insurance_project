@@ -83,10 +83,16 @@ The application is structured as follows:
 ### Controllers
 
 - **PartnerController**: This API controller enables dynamic management of partners and their data, and can be used to enhance the application with functionalities for retrieving, adding, and displaying partner details via RESTful services.
---**PolicyController**: This is an API controller for managing policies, providing endpoints to retrieve all policies, get policies by partner ID, and add new policies to the system.
+- **PolicyController**: This is an API controller for managing policies, providing endpoints to retrieve all policies, get policies by partner ID, and add new policies to the system.
 - **HomeController**: This controller manages the display and handling of partner information in the application. It retrieves a list of all partners or detailed information for a specific partner, and processes the data into DTOs for use in views or JSON responses.
 - **CreatePartnerController**: This MVC controller handles the creation of a new partner by displaying a form to the user (via the GET method) and processing the form submission (via the POST method). It validates the input data, interacts with the PartnerService to add the partner, and handles success or error scenarios accordingly.
 - **CreatePolicyController**: This MVC controller includes a GET action to display the policy creation form and a POST action to validate the form, check for existing policies, and save the new policy if valid.
+
+### Services
+
+- **PartnerService**: This PartnerService class handles database operations related to partners, including retrieving partner details, adding new partners, and managing their associated policies using Dapper. It also includes methods to fetch city names, check for duplicate records, and calculate policy statistics for each partner.
+- **PolicyService**: The PolicyService class handles operations related to insurance policies, including retrieving all policies, fetching policies by partner ID, and adding new policies while ensuring policy number uniqueness. It utilizes Dapper for database interactions and includes methods to handle exceptions effectively during database operations.
+
 
 ### Models
 

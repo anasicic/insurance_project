@@ -97,7 +97,7 @@
 
             <!-- Policy Amount Field -->
             <div class="form-group">
-                <label for="PolicyAmount" class="form-label">Policy Amount</label>
+                <label for="PolicyAmount" class="form-label">Policy Amount (kn) </label>
                 <input type="number" class="form-control @((ViewData.ModelState["PolicyAmount"]?.Errors.Count > 0) ? "is-invalid" : "")" id="PolicyAmount" name="PolicyAmount" required min="0.01" step="0.01" value="@Model.PolicyAmount" placeholder="Enter amount">
                 @Html.ValidationMessageFor(model => model.PolicyAmount, "", new { @class = "text-danger" })
             </div>

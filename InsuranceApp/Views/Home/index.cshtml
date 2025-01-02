@@ -114,10 +114,11 @@
             <tbody>
                 @foreach (var partner in Model)
                 {
-                    // Provjera je li partner nedavno dodan
+                    // Provjera je li partner označen zvjezdicom
+                    var isStarred = partner.TotalPolicies > 5 || partner.TotalPolicyAmount > 5000;  <!-- Zamijenite sa TotalPolicies -->
                     var isNewlyAdded = TempData["Success"] is int successId && successId == partner.PartnerId;
                     <tr class="@(isNewlyAdded ? "newly-added" : "")">
-                        <td>@partner.FullName</td>
+                        <td>@(isStarred ? "*" : "") @partner.FullName</td>
                         <td>@partner.PartnerNumber</td>
                         <td>@partner.CroatianPIN</td>
                         <td>@partner.PartnerTypeName</td>
@@ -170,9 +171,12 @@
                     return response.json();
                 })
                 .then(data => {
+                    // Check if the partner is marked with a star
+                    const isStarred = data.totalPolicies > 5 || data.totalPolicyAmount > 5000;  
+
                     // Generate HTML for partner details
-                    let details = `
-                        <tr><th>Full Name</th><td>${data.fullName}</td></tr>
+                    let details = ` 
+                        <tr><th>Full Name</th><td>${isStarred ? "*" : ""} ${data.fullName}</td></tr>
                         <tr><th>Address</th><td>${data.address || "N/A"}</td></tr>
                         <tr><th>City</th><td>${data.cityName}</td></tr>
                         <tr><th>Partner Number</th><td>${data.partnerNumber}</td></tr>

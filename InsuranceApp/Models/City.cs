@@ -3,7 +3,7 @@ namespace InsuranceApp.Models;
 
 public class City
 {
-    public int CityId { get; set; } = 1;
+    public int CityId { get; set; } = 0;
 
     [StringLength(40)] 
     public required string CityName { get; set; }

@@ -13,7 +13,7 @@ public class PartnerDetailDTO
     public required string LastName { get; set; }
 
     [StringLength(255, MinimumLength = 2)]  
-    public string FullName => $"{FirstName} {LastName};";
+    public string FullName => $"{FirstName} {LastName}";
 
     public string Address { get; set; } ="";
 
@@ -43,5 +43,8 @@ public class PartnerDetailDTO
     public required int CityId { get; set; }
 
     public string CityName { get; set; } ="";
+
+    public int TotalPolicies { get; set; }
+    public decimal TotalPolicyAmount { get; set; } 
 
 }

@@ -49,7 +49,7 @@ namespace InsuranceApp.Services
             try
             {
                 var query = "SELECT * FROM Policy WHERE PolicyNumber = @PolicyNumber";
-                // Vraća Policy ili null ako ne postoji
+                // It returns a Policy or null if it does not exist.
                 return await _dbConnection.QueryFirstOrDefaultAsync<Policy>(query, new { PolicyNumber = policyNumber });
             }
             catch (Exception ex)

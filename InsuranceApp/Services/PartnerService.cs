@@ -1,6 +1,10 @@
-using InsuranceApp.Models;
-using System.Data;
 using Dapper;
+using InsuranceApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace InsuranceApp.Services
 {
@@ -25,7 +29,7 @@ namespace InsuranceApp.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching all partners: {ex.Message}");
-                throw; 
+                throw;
             }
         }
 
@@ -40,46 +44,39 @@ namespace InsuranceApp.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching partner by ID {id}: {ex.Message}");
-                throw; 
+                throw;
             }
         }
 
-        // Dohvat imena grada prema CityId
+        // Get city name by CityId
         public async Task<string> GetCityNameByIdAsync(int cityId)
         {
             try
             {
-                // SQL upit za dohvat imena grada prema CityId
                 var query = "SELECT CityName FROM City WHERE CityId = @CityId";
-                
-                // Izvrši upit i dohvatimo ime grada
                 var cityName = await _dbConnection.QuerySingleOrDefaultAsync<string>(query, new { CityId = cityId });
-
-                // Ako grad nije pronađen, vraćamo "Unknown City"
                 return cityName ?? "Unknown City";
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Greška prilikom dohvaćanja grada za ID {cityId}: {ex.Message}");
-                return "Unknown City"; // U slučaju greške
+                Console.WriteLine($"Error fetching city name for ID {cityId}: {ex.Message}");
+                return "Unknown City";
             }
         }
 
+        // Get all cities
         public async Task<IEnumerable<City>> GetAllCitiesAsync()
         {
             const string query = "SELECT CityId, CityName FROM City ORDER BY CityName";
-
-            var cities = await _dbConnection.QueryAsync<City>(query);
-            return cities;
+            return await _dbConnection.QueryAsync<City>(query);
         }
 
         // Add a new partner
         public async Task AddPartnerAsync(Partner partner)
         {
-            
             try
             {
-                // Check if a partner with the same CroatianPIN (OIB) already exists
+                // Check if a partner with the same CroatianPIN already exists
                 var existingPartnerByPIN = await _dbConnection.QueryFirstOrDefaultAsync<Partner>(
                     "SELECT * FROM Partner WHERE CroatianPIN = @CroatianPIN", new { CroatianPIN = partner.CroatianPIN });
 
@@ -97,35 +94,65 @@ namespace InsuranceApp.Services
                     throw new ApplicationException("External Code already exists.");
                 }
 
-                Console.WriteLine($"FirstName: {partner.FirstName}");
-                Console.WriteLine($"LastName: {partner.LastName}");
-                Console.WriteLine($"CityId: {partner.CityId}");
-                Console.WriteLine($"PartnerNumber: {partner.PartnerNumber}");
-
-                // Ako CreatedAtUtc nije postavljen, postavlja se trenutni UTC datum
+                // Set CreatedAtUtc if not set
                 if (partner.CreatedAtUtc == default)
                 {
                     partner.CreatedAtUtc = DateTime.UtcNow;
                 }
 
-                // SQL upit za unos partnera u bazu
+                // SQL query to insert partner
                 var query = @"
                     INSERT INTO Partner (FirstName, LastName, Address, PartnerNumber, CroatianPIN, PartnerTypeId, CreatedAtUtc, CreateByUser, IsForeign, ExternalCode, Gender, CityId)
                     VALUES (@FirstName, @LastName, @Address, @PartnerNumber, @CroatianPIN, @PartnerTypeId, @CreatedAtUtc, @CreateByUser, @IsForeign, @ExternalCode, @Gender, @CityId);
-                    SELECT last_insert_rowid();";  // This will return the last inserted ID
+                    SELECT last_insert_rowid();";  // SQLite specific query to get the last inserted ID
                 
-                // Execute the query and retrieve the PartnerId
                 var partnerId = await _dbConnection.QuerySingleAsync<int>(query, partner);
-
                 partner.PartnerId = partnerId;
 
-                // Log the PartnerId 
                 Console.WriteLine($"Partner ID: {partnerId}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Greška prilikom dodavanja partnera: {ex.Message}");
-                throw new ApplicationException("Došlo je do greške prilikom dodavanja partnera.", ex);
+                Console.WriteLine($"Error adding partner: {ex.Message}");
+                throw new ApplicationException("An error occurred while adding the partner.", ex);
+            }
+        }
+
+        // Get policy count for a partner
+        public async Task<int> GetPolicyCountByPartnerIdAsync(int partnerId)
+        {
+            const string query = "SELECT COUNT(*) FROM Policy WHERE PartnerId = @PartnerId";
+            return await _dbConnection.QuerySingleAsync<int>(query, new { PartnerId = partnerId });
+        }
+
+        // Get total policy amount for a partner
+        public async Task<decimal> GetPolicyTotalAmountByPartnerIdAsync(int partnerId)
+        {
+            const string query = "SELECT COALESCE(SUM(PolicyAmount), 0) FROM Policy WHERE PartnerId = @PartnerId";
+            return await _dbConnection.QuerySingleAsync<decimal>(query, new { PartnerId = partnerId });
+        }
+
+        // Get partner details with policy information
+        public async Task<(Partner, int, decimal)> GetPartnerDetailsWithPoliciesAsync(int partnerId)
+        {
+            try
+            {
+                var partner = await GetPartnerByIdAsync(partnerId);
+
+                if (partner == null)
+                {
+                    throw new KeyNotFoundException($"Partner with ID {partnerId} not found.");
+                }
+
+                var policyCount = await GetPolicyCountByPartnerIdAsync(partnerId);
+                var totalPolicyAmount = await GetPolicyTotalAmountByPartnerIdAsync(partnerId);
+
+                return (partner, policyCount, totalPolicyAmount);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching partner details for ID {partnerId}: {ex.Message}");
+                throw;
             }
         }
     }

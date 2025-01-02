@@ -16,18 +16,18 @@ namespace InsuranceApp.Controllers
         // GET: PolicyMvc/Add
         public IActionResult AddPolicy(int partnerId)
         {
-            // Inicijaliziraj prazan model Policy i postavi PartnerId
+            // Initialize an empty Policy model and set PartnerId
             var policy = new Policy
             {
-                PartnerId = partnerId,  // Postavi PartnerId
-                // Inicijaliziraj ostale obavezne članove (ako su potrebni)
-                PolicyNumber = "",       // Postavi početnu vrijednost ako je potrebno
-                PolicyAmount = 0       // Postavi početnu vrijednost ako je potrebno
+                PartnerId = partnerId,  // Set the PartnerId from the passed data
+                                        
+                PolicyNumber = "",     
+                PolicyAmount = 0       
             };
 
             ViewBag.PartnerId = partnerId;
 
-            return View(policy); // Prosljeđuje inicijalizirani model u View
+            return View(policy);        // Pass the initialized model to the View
         }
 
         // POST: PolicyMvc/Add
@@ -38,10 +38,10 @@ namespace InsuranceApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return View(policy); // Ako podaci nisu validni, vraća obrazac sa trenutnim podacima
+                    return View(policy); 
                 }
 
-                // Provjerite postoji li polica s istim brojem
+                // Check if a policy with the same policy number already exists
                 var existingPolicy = await _policyService.GetPolicyByNumberAsync(policy.PolicyNumber);
                 if (existingPolicy != null)
                 {
@@ -49,13 +49,13 @@ namespace InsuranceApp.Controllers
                     return View(policy);
                 }
 
-                // Dodajte novu policu u bazu
+                // Add new policy to database
                 await _policyService.AddPolicyAsync(policy);
-                return RedirectToAction("Index", "Home"); // Redirektanje na početnu stranicu ili neku drugu
+                return RedirectToAction("Index", "Home"); // Redirect to the Home page
             }
             catch (Exception ex)
             {
-                // Ako dođe do greške, logiraj ili prikazuj poruku
+                // If an error occurs, log it or display a message
                 ModelState.AddModelError("", $"An error occurred while adding the policy: {ex.Message}");
                 return View(policy);
             }
