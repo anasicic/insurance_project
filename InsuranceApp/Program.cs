@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.WebHost.UseUrls("http://localhost:5000"); // Set the base URL for the application
+builder.WebHost.UseUrls("http://localhost:5000"); 
 
 // Add database connection (SQLite) as a singleton service
 builder.Services.AddSingleton<IDbConnection>(sp =>
@@ -31,7 +31,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(); // Swagger will be available at /swagger URL
+    app.UseSwaggerUI(); 
 }
 
 // Enable static files (CSS, JS, images, etc.) to be served by the app
@@ -42,10 +42,9 @@ app.MapControllerRoute(
     name: "default", 
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Map route for creating partner (use the PartnerController and AddPartner method)
+// Map route for creating partner 
 app.MapControllerRoute(
     name: "createPartner",
     pattern: "CreatePartner/{action=Create}/{id?}");
 
-// Run the application
 app.Run();
