@@ -48,8 +48,11 @@ namespace InsuranceApp.Controllers
                 TotalPolicyAmount = await _partnerService.GetPolicyTotalAmountByPartnerIdAsync(p.PartnerId) 
             }))).ToList(); // Convert the asynchronous result to a concrete list
 
+            // Sort the list by CreatedAtUtc, from newest to oldest
+            var sortedPartnerDtos = partnerDtos.OrderByDescending(p => p.CreatedAtUtc).ToList();
+
             // Pass the partnerDTO to the View
-            return View(partnerDtos);
+            return View(sortedPartnerDtos);
         }
 
         // Action to fetch partner details

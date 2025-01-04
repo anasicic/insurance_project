@@ -10,7 +10,7 @@
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -19,6 +19,23 @@
         h1 {
             font-weight: 700;
             color: #343a40;
+        }
+
+        /* Table - center */
+        .table-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .table {
+            width: 100%; 
+        }
+
+        .table thead th,
+        .table tbody td {
+            min-width: 150px;
+            white-space: nowrap;
+            text-align: center;
         }
 
         .table thead th {
@@ -73,82 +90,115 @@
             background-color: #f8f9fa;
         }
 
+        .action-buttons > *:not(:last-child) {
+            margin-right: 8px;
+        }
+
         .action-buttons {
             display: flex;
-            gap: 8px;
             justify-content: center;
         }
 
-        /* Stil za novi partner koji je upravo dodan */
         .newly-added {
-            background-color: #d4edda;  /* Svijetla zelena pozadina */
-            font-weight: bold;          /* Podebljan font */
-            color: #155724;             /* Tamno zelena boja za tekst */
+            background-color: #d4edda;
+            font-weight: bold;
+            color: #155724;
+        }
+
+        .modal-content {
+            max-width: 600px; 
+            margin: auto;
+        }
+
+        .modal-body table {
+            width: 100%;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+
+        .add-partner-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        /* Table container will hold the table centered */
+        .table-container {
+            width: 100%;
+        }
+
+        /* Limit button width */
+        .add-partner-container a {
+            width: auto; 
         }
     </style>
 </head>
 
 <body>
     <div class="container my-5">
-        <h1 class="text-center my-4">List of Partners</h1>
+        <h1 class="text-center my-4">Partners List</h1>
 
-        <!-- Add Partner Button -->
-        <div class="text-end mb-3">
+        <!-- Add Partner Button (aligned with table) -->
+        <div class="add-partner-container">
             <a href="@Url.Action("Create", "CreatePartner")" class="btn btn-primary">Add New Partner</a>
         </div>
 
         <!-- Table displaying partners -->
-        <table class="table table-hover table-bordered">
-            <thead>
-                <tr>
-                    <th>Full Name</th>
-                    <th>Partner Number</th>
-                    <th>Croatian PIN</th>
-                    <th>Partner Type</th>
-                    <th>Foreign Status</th>
-                    <th>Gender</th>
-                    <th>Creation Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var partner in Model)
-                {
-                    // Provjera je li partner označen zvjezdicom
-                    var isStarred = partner.TotalPolicies > 5 || partner.TotalPolicyAmount > 5000;  <!-- Zamijenite sa TotalPolicies -->
-                    var isNewlyAdded = TempData["Success"] is int successId && successId == partner.PartnerId;
-                    <tr class="@(isNewlyAdded ? "newly-added" : "")">
-                        <td>@(isStarred ? "*" : "") @partner.FullName</td>
-                        <td>@partner.PartnerNumber</td>
-                        <td>@partner.CroatianPIN</td>
-                        <td>@partner.PartnerTypeName</td>
-                        <td>@(partner.IsForeign ? "Foreign partner" : "Local partner")</td>
-                        <td>@partner.Gender</td>
-                        <td>@partner.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#partnerModal"
-                                    onclick="showPartnerDetails(@partner.PartnerId)">Details</button>
-                            <a href="@Url.Action("AddPolicy", "CreatePolicy", new { partnerId = partner.PartnerId })"
-                               class="btn btn-success btn-sm">Add Policy</a>
-                        </td>
+        <div class="table-container">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Partner Number</th>
+                        <th>Croatian PIN</th>
+                        <th>Partner Type</th>
+                        <th>Foreign Status</th>
+                        <th>Gender</th>
+                        <th>Creation Date</th>
+                        <th>Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var partner in Model)
+                    {
+                        var isStarred = partner.TotalPolicies > 5 || partner.TotalPolicyAmount > 5000;
+                        var isNewlyAdded = TempData["Success"] is int successId && successId == partner.PartnerId;
+                        <tr class="@(isNewlyAdded ? "newly-added" : "")">
+                            <td>@(isStarred ? "*" : "") @partner.FullName</td>
+                            <td>@partner.PartnerNumber</td>
+                            <td>@partner.CroatianPIN</td>
+                            <td>@partner.PartnerTypeName</td>
+                            <td>@(partner.IsForeign ? "Foreign partner" : "Local partner")</td>
+                            <td>@partner.Gender</td>
+                            <td>@partner.CreatedAtUtc.ToString("yyyy-MM-dd")</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#partnerModal"
+                                        onclick="showPartnerDetails(@partner.PartnerId)">Details</button>
+                                <a href="@Url.Action("AddPolicy", "CreatePolicy", new { partnerId = partner.PartnerId })"
+                                   class="btn btn-success btn-sm">Add Policy</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Modal for displaying partner details -->
     <div class="modal fade" id="partnerModal" tabindex="-1" aria-labelledby="partnerModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="partnerModalLabel">Partner Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <table class="table table-striped">
                         <tbody id="partnerDetails">
-                            <!-- Partner details will load dynamically -->
                             <tr>
                                 <td colspan="2" class="text-center text-muted">Loading...</td>
                             </tr>
@@ -160,9 +210,9 @@
     </div>
 
     <!-- JavaScript for loading partner details -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
         function showPartnerDetails(partnerId) {
-            // Fetch request to get partner details
             fetch(`/api/Partner/Details/${partnerId}`)
                 .then(response => {
                     if (!response.ok) {
@@ -171,10 +221,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    // Check if the partner is marked with a star
-                    const isStarred = data.totalPolicies > 5 || data.totalPolicyAmount > 5000;  
-
-                    // Generate HTML for partner details
+                    const isStarred = data.totalPolicies > 5 || data.totalPolicyAmount > 5000;
                     let details = ` 
                         <tr><th>Full Name</th><td>${isStarred ? "*" : ""} ${data.fullName}</td></tr>
                         <tr><th>Address</th><td>${data.address || "N/A"}</td></tr>
@@ -185,12 +232,15 @@
                         <tr><th>Creation Date</th><td>${new Date(data.createdAtUtc).toLocaleDateString()}</td></tr>
                         <tr><th>Created By</th><td>${data.createByUser}</td></tr>
                         <tr><th>Foreign Status</th><td>${data.isForeign ? "Foreign partner" : "Local partner"}</td></tr>
+                        <tr><th>External Code</th><td>${data.externalCode}
                         <tr><th>Gender</th><td>${data.gender}</td></tr>
+                        <tr><th>Total Policies</th><td>${data.totalPolicies}</td></tr>
+                        <tr><th>Total Policy Amount</th><td>${data.totalPolicyAmount}</td></tr>
                     `;
                     document.getElementById("partnerDetails").innerHTML = details;
                 })
                 .catch(error => {
-                    document.getElementById("partnerDetails").innerHTML = `
+                    document.getElementById("partnerDetails").innerHTML = ` 
                         <tr>
                             <td colspan="2" class="text-danger">An error occurred: ${error.message}</td>
                         </tr>
@@ -200,7 +250,7 @@
     </script>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

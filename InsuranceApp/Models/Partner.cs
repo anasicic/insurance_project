@@ -13,12 +13,12 @@ public class Partner
     public required string FirstName { get; set; } = string.Empty;
 
     [StringLength(255, MinimumLength = 2)]  
-    public required string LastName { get; set; } 
+    public required string LastName { get; set; } = string.Empty;
  
     public string Address { get; set; } = string.Empty;
     
     [StringLength(20, MinimumLength = 20)]  
-    public required string PartnerNumber { get; set; } 
+    public required string PartnerNumber { get; set; } = string.Empty;
 
     [StringLength(11, MinimumLength = 11)]
     public string CroatianPIN { get; set; }= string.Empty;
@@ -35,7 +35,7 @@ public class Partner
     public required bool IsForeign { get; set; }  
 
     [StringLength(20, MinimumLength = 10, ErrorMessage = "ExternalCode must be between 10 and 20 characters.")]  
-    public required string ExternalCode { get; set; } 
+    public required string ExternalCode { get; set; } = string.Empty;
 
     [RegularExpression("^[MFN]$")] 
     public required char Gender { get; set; } 
@@ -43,6 +43,7 @@ public class Partner
     public required int CityId { get; set; } = 1;
 
     public int TotalPolicies { get; set; }
+
     public decimal TotalPolicyAmount { get; set; } 
 
     

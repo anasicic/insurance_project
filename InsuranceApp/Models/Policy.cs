@@ -9,12 +9,11 @@ public class Policy
     public int PolicyId { get; set; }
 
     [StringLength(15, MinimumLength = 10)] 
-    public required string PolicyNumber { get; set; }
+    public required string PolicyNumber { get; set; } = string.Empty;
 
     [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]
     public required decimal PolicyAmount { get; set; }
 
     public int PartnerId { get; set; }
  
-
 }

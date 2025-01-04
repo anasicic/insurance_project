@@ -70,7 +70,9 @@ namespace InsuranceApp.Controllers
                 CityName = cityName,
                 CityId = partner.CityId,
                 Address = partner.Address,
-                ExternalCode = partner.ExternalCode
+                ExternalCode = partner.ExternalCode,
+                TotalPolicies = await _partnerService.GetPolicyCountByPartnerIdAsync(partner.PartnerId),
+                TotalPolicyAmount = await _partnerService.GetPolicyTotalAmountByPartnerIdAsync(partner.PartnerId)
             };
 
             return Ok(partnerDetailDto);
