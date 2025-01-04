@@ -49,7 +49,7 @@ Make sure you have the following installed on your system:
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.com/anasicic/MyApp.git
+    git clone https://github.com/anasicic/insurance_project.git
     ```
 
 2. **Navigate to the Project Directory**:
